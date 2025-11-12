@@ -9,6 +9,8 @@ namespace Domain.Entities.Affiliate
 {
     public class AffiliateProgram : BaseEntity
     {
+        public string Name { get; set; } = string.Empty; // ✅ EKLENDİ
+
         public long MerchantId { get; set; }
         public int DefaultCurrencyId { get; set; }
         public decimal BaseCommissionPct { get; set; }

@@ -8,6 +8,7 @@ public interface IAppDbContext
 {
     DbSet<Merchant> Merchants { get; }
     DbSet<AffiliateProgram> AffiliatePrograms { get; }
+    DbSet<Offer> Offers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

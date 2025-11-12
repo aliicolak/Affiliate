@@ -30,7 +30,8 @@ builder.Services.AddSwaggerGen(o =>
 });
 builder.Services.AddApplication(); 
 builder.Services.AddInfrastructure(builder.Configuration);
-
+builder.Services.AddControllers()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<UpdateOfferCommandValidator>());
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
