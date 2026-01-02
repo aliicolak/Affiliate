@@ -1,5 +1,6 @@
-using Infrastructure;
+﻿using Infrastructure;
 using Application;
+using Microsoft.AspNetCore.HttpOverrides; // 1. Bunu ekle
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,17 +29,24 @@ builder.Services.AddSwaggerGen(o =>
         [jwtScheme] = Array.Empty<string>()
     });
 });
-builder.Services.AddApplication(); 
+
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
-   
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// 2. Nginx'ten gelen HTTPS bilgisini okumak için bunu ekle (UseHttpsRedirection'dan ÖNCE olmalı)
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// 3. Swagger'ı her zaman aktif et (Veya sadece sunucuda görmek istiyorsan if'i kaldır)
+app.UseSwagger();
+app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Affiliate API v1");
+    c.RoutePrefix = string.Empty; // Sitenin ana dizininde (aliicolak.com) Swagger açılsın
+});
 
 app.UseHttpsRedirection();
 
