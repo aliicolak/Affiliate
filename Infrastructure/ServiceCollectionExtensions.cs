@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Identity;
 using Domain.Entities.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Security;
+using Infrastructure.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Application.Abstractions.Persistence;
+using Application.Abstractions.Services;
+
 namespace Infrastructure
 {
     public static class ServiceCollectionExtensions
@@ -57,10 +60,23 @@ namespace Infrastructure
 
             services.AddAuthorization();
 
+            // Core services
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+
+            // Tracking services
+            services.AddScoped<ITrackingCodeGenerator, TrackingCodeGenerator>();
+            services.AddScoped<IGeoIpService, GeoIpService>();
+            services.AddScoped<IUserAgentParser, UserAgentParser>();
+
+            // Commission services
+            services.AddScoped<ICommissionCalculator, CommissionCalculator>();
+
+            // Notification services
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }
     }
 }
+

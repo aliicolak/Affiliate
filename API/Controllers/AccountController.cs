@@ -25,7 +25,7 @@ namespace API.Controllers
             _jwt = jwt;
         }
 
-        [HttpPost("ALPER")]
+        [HttpPost("register")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest req)
         {

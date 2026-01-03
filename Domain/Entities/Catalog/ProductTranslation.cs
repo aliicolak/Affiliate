@@ -11,7 +11,9 @@ namespace Domain.Entities.Catalog
     {
         public long ProductId { get; set; }
         public int LanguageId { get; set; }
+        public string LanguageCode { get; set; } = "tr";
         public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public string? ShortDesc { get; set; }
         public string? LongDesc { get; set; }
         public string? MetaTitle { get; set; }

@@ -17,6 +17,7 @@ namespace Domain.Entities.Affiliate
         public decimal PriceAmount { get; set; }
         public int CurrencyId { get; set; }
         public bool InStock { get; set; } = true;
+        public bool IsActive { get; set; } = true;
         public decimal? ShippingFee { get; set; }
 
         public Merchant Merchant { get; set; } = null!;

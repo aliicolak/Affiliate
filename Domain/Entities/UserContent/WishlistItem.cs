@@ -12,6 +12,7 @@ namespace Domain.Entities.UserContent
         public long WishlistId { get; set; }
         public long ProductId { get; set; }
         public string? Note { get; set; }
+        public DateTime AddedUtc { get; set; } = DateTime.UtcNow;
 
         public Wishlist Wishlist { get; set; } = null!;
         public Product Product { get; set; } = null!;

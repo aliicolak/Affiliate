@@ -1,9 +1,11 @@
-﻿using Infrastructure;
+﻿using API.Middleware;
+using Infrastructure;
 using Application;
-using Microsoft.AspNetCore.HttpOverrides; // 1. Bunu ekle
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
@@ -24,10 +26,7 @@ builder.Services.AddSwaggerGen(o =>
         }
     };
     o.AddSecurityDefinition("Bearer", jwtScheme);
-    o.AddSecurityRequirement(new()
-    {
-        [jwtScheme] = Array.Empty<string>()
-    });
+    o.AddSecurityRequirement(new() { [jwtScheme] = Array.Empty<string>() });
 });
 
 builder.Services.AddApplication();
@@ -35,24 +34,24 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// 2. Nginx'ten gelen HTTPS bilgisini okumak için bunu ekle (UseHttpsRedirection'dan ÖNCE olmalı)
+// Middleware pipeline (order matters!)
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-// 3. Swagger'ı her zaman aktif et (Veya sadece sunucuda görmek istiyorsan if'i kaldır)
 app.UseSwagger();
-app.UseSwaggerUI(c => {
+app.UseSwaggerUI(c =>
+{
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Affiliate API v1");
-    c.RoutePrefix = string.Empty; // Sitenin ana dizininde (aliicolak.com) Swagger açılsın
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
