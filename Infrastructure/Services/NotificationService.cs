@@ -12,10 +12,12 @@ namespace Infrastructure.Services;
 public sealed class NotificationService : INotificationService
 {
     private readonly IAppDbContext _context;
+    private readonly IRealTimeService _realTimeService;
 
-    public NotificationService(IAppDbContext context)
+    public NotificationService(IAppDbContext context, IRealTimeService realTimeService)
     {
         _context = context;
+        _realTimeService = realTimeService;
     }
 
     public async Task SendAsync(
@@ -42,6 +44,15 @@ public sealed class NotificationService : INotificationService
 
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _realTimeService.SendNotificationAsync(userId, notification, cancellationToken);
+        }
+        catch
+        {
+            // Ignore real-time errors
+        }
         
         // TODO: E-posta gönderimi (IEmailSender ile)
     }

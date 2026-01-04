@@ -41,6 +41,7 @@ public sealed class MerchantsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateMerchantCommand command, CancellationToken ct)
     {
         if (id != command.Id) return BadRequest("ID mismatch");
@@ -49,6 +50,7 @@ public sealed class MerchantsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(long id, CancellationToken ct)
     {
         var result = await _mediator.Send(new DeleteMerchantCommand(id), ct);

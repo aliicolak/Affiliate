@@ -43,5 +43,11 @@ public enum NotificationType
     /// <summary>
     /// Yeni teklif
     /// </summary>
-    NewOffer = 13
+    NewOffer = 13,
+
+    // Social
+    SocialLike = 20,
+    SocialComment = 21,
+    SocialFollow = 22,
+    SocialShare = 23
 }

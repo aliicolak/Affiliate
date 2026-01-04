@@ -10,6 +10,7 @@ namespace Domain.Entities.Affiliate
     public class Offer : BaseEntity
     {
         public long ProductId { get; set; }
+        public Domain.Entities.Catalog.Product? Product { get; set; }
         public long MerchantId { get; set; }
         public long? ProgramId { get; set; }
         public string AffiliateUrl { get; set; } = string.Empty;

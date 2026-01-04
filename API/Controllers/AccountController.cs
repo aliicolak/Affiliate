@@ -4,6 +4,7 @@ using Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -27,6 +28,7 @@ namespace API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
+        [EnableRateLimiting("AuthPolicy")]
         public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest req)
         {
             var user = new ApplicationUser
@@ -51,6 +53,7 @@ namespace API.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
+        [EnableRateLimiting("AuthPolicy")]
         public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest req)
         {
             // username veya email

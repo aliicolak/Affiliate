@@ -2,6 +2,8 @@ using Application.Features.Conversions.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace API.Controllers;
 
@@ -28,13 +30,10 @@ public sealed class WebhooksController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> RecordConversion([FromBody] ConversionPostbackDto request)
     {
-        // API key doğrulama
-        var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
-        var validApiKey = _configuration["Webhooks:ApiKey"];
-        
-        if (string.IsNullOrEmpty(apiKey) || apiKey != validApiKey)
+        // HMAC signature verification
+        if (!VerifySignature())
         {
-            return Unauthorized("Invalid API key");
+            return Unauthorized("Invalid signature");
         }
 
         try
@@ -87,6 +86,58 @@ public sealed class WebhooksController : ControllerBase
             var gif = Convert.FromBase64String("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
             return File(gif, "image/gif");
         }
+    }
+
+    /// <summary>
+    /// HMAC-SHA256 signature verification
+    /// </summary>
+    private bool VerifySignature()
+    {
+        var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
+        var signature = Request.Headers["X-Signature"].FirstOrDefault();
+        var timestamp = Request.Headers["X-Timestamp"].FirstOrDefault();
+
+        var validApiKey = _configuration["Webhooks:ApiKey"];
+        var hmacSecret = _configuration["Webhooks:HmacSecret"];
+
+        // API key check
+        if (string.IsNullOrEmpty(apiKey) || apiKey != validApiKey)
+        {
+            return false;
+        }
+
+        // If no HMAC secret configured, allow API key only (backward compatible)
+        if (string.IsNullOrEmpty(hmacSecret) || hmacSecret == "your-hmac-secret-min-32-chars-here")
+        {
+            return true;
+        }
+
+        // HMAC signature verification
+        if (string.IsNullOrEmpty(signature) || string.IsNullOrEmpty(timestamp))
+        {
+            return false;
+        }
+
+        // Check timestamp (within 5 minutes to prevent replay attacks)
+        if (long.TryParse(timestamp, out var ts))
+        {
+            var requestTime = DateTimeOffset.FromUnixTimeSeconds(ts);
+            if (Math.Abs((DateTimeOffset.UtcNow - requestTime).TotalMinutes) > 5)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        // Compute expected signature
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(hmacSecret));
+        var payload = $"{timestamp}.{apiKey}";
+        var expectedSignature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(payload)));
+
+        return signature == expectedSignature;
     }
 }
 

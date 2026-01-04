@@ -14,6 +14,8 @@ using Domain.Entities.Publisher;
 using Domain.Entities.Conversion;
 using Domain.Entities.Vendor;
 using Domain.Entities.Notification;
+using Domain.Entities.Blog;
+using Domain.Entities.Social;
 
 namespace Infrastructure.Persistence
 {
@@ -67,6 +69,19 @@ namespace Infrastructure.Persistence
         public DbSet<Domain.Entities.Notification.Notification> Notifications => Set<Domain.Entities.Notification.Notification>();
         public DbSet<NotificationTemplate> NotificationTemplates => Set<NotificationTemplate>();
 
+        // Blog
+        public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+        public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
+        public DbSet<BlogComment> BlogComments => Set<BlogComment>();
+
+        // Social
+        public DbSet<Like> Likes => Set<Like>();
+        public DbSet<ProductShare> ProductShares => Set<ProductShare>();
+        public DbSet<ShareComment> ShareComments => Set<ShareComment>();
+        public DbSet<UserFollow> UserFollows => Set<UserFollow>();
+        public DbSet<Collection> Collections => Set<Collection>();
+        public DbSet<CollectionItem> CollectionItems => Set<CollectionItem>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -92,6 +107,7 @@ namespace Infrastructure.Persistence
             builder.Entity<Merchant>().HasQueryFilter(m => m.DeletedUtc == null);
             builder.Entity<AffiliateProgram>().HasQueryFilter(a => a.DeletedUtc == null);
             builder.Entity<Offer>().HasQueryFilter(o => o.DeletedUtc == null);
+            builder.Entity<BlogPost>().HasQueryFilter(bp => bp.DeletedUtc == null);
 
             // Apply configurations dynamically
             builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

@@ -1,9 +1,12 @@
 ﻿using Domain.Entities.Affiliate;
+using Domain.Entities.Blog;
 using Domain.Entities.Catalog;
 using Domain.Entities.Commission;
 using Domain.Entities.Conversion;
+using Domain.Entities.Identity;
 using Domain.Entities.Notification;
 using Domain.Entities.Publisher;
+using Domain.Entities.Social;
 using Domain.Entities.Tracking;
 using Domain.Entities.UserContent;
 using Domain.Entities.Vendor;
@@ -51,6 +54,22 @@ public interface IAppDbContext
     // Notification
     DbSet<Domain.Entities.Notification.Notification> Notifications { get; }
     DbSet<NotificationTemplate> NotificationTemplates { get; }
+
+    // Blog
+    DbSet<BlogPost> BlogPosts { get; }
+    DbSet<BlogCategory> BlogCategories { get; }
+    DbSet<BlogComment> BlogComments { get; }
+
+    // Identity
+    DbSet<ApplicationUser> Users { get; }
+
+    // Social
+    DbSet<Like> Likes { get; }
+    DbSet<ProductShare> ProductShares { get; }
+    DbSet<ShareComment> ShareComments { get; }
+    DbSet<UserFollow> UserFollows { get; }
+    DbSet<Collection> Collections { get; }
+    DbSet<CollectionItem> CollectionItems { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
